@@ -19,6 +19,7 @@ projects_skipped=0
 conflicts_skipped=0
 skills_copied_or_updated=0
 agents_copied_or_updated=0
+references_copied_or_updated=0
 errors_count=0
 updated_project_paths=()
 
@@ -60,6 +61,10 @@ should_sync_agents() {
   [ "${SYNC_CONTENT}" = "agents" ] || [ "${SYNC_CONTENT}" = "both" ]
 }
 
+should_sync_references() {
+  should_sync_agents
+}
+
 validate_sync_content() {
   case "${SYNC_CONTENT}" in
     skills | agents | both)
@@ -81,6 +86,10 @@ validate_paths() {
 
   if should_sync_agents; then
     validate_path_exists "${SOURCE_DIR}/agents"
+  fi
+
+  if should_sync_references; then
+    validate_path_exists "${SOURCE_DIR}/references"
   fi
 }
 
@@ -125,6 +134,14 @@ collect_agent_sources() {
       printf "%s\n" "${agent_source}"
     fi
   done | sort
+}
+
+collect_reference_sources() {
+  if ! should_sync_references; then
+    return 0
+  fi
+
+  find "${SOURCE_DIR}/references" -type f -name "*.md" -print | sort
 }
 
 is_previous_source_content() {
@@ -233,6 +250,9 @@ process_source_file() {
       agents/*)
         agents_copied_or_updated=$((agents_copied_or_updated + 1))
         ;;
+      references/*)
+        references_copied_or_updated=$((references_copied_or_updated + 1))
+        ;;
     esac
   fi
 
@@ -292,9 +312,10 @@ print_summary() {
   echo "projects updated:         ${projects_updated}"
   echo "projects skipped:         ${projects_skipped}"
   echo "conflicts skipped:        ${conflicts_skipped}"
-  echo "skills copied or updated: ${skills_copied_or_updated}"
-  echo "agents copied or updated: ${agents_copied_or_updated}"
-  echo "errors:                   ${errors_count}"
+  echo "skills copied or updated:      ${skills_copied_or_updated}"
+  echo "agents copied or updated:      ${agents_copied_or_updated}"
+  echo "references copied or updated:  ${references_copied_or_updated}"
+  echo "errors:                        ${errors_count}"
 
   if [ "${#updated_project_paths[@]}" -gt 0 ]; then
     echo
@@ -320,6 +341,7 @@ main() {
 
   collect_skill_sources >> "${TMP_DIR}/source-files"
   collect_agent_sources >> "${TMP_DIR}/source-files"
+  collect_reference_sources >> "${TMP_DIR}/source-files"
 
   if [ ! -s "${TMP_DIR}/source-files" ]; then
     die "No source files found for SYNC_CONTENT=${SYNC_CONTENT}"

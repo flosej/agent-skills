@@ -110,6 +110,7 @@ git pull
 - By default `TARGET_ROOT` is the parent directory of this repo, so cloning `agent-skills` next to your other projects requires no extra configuration.
 - Copies `skills/**/SKILL.md` to `<project>/.github/skills/<skill-name>/SKILL.md`.
 - Copies `agents/*.md` to `<project>/.github/agents/<agent-name>.md`.
+- Copies `references/*.md` to `<project>/.github/references/<file>.md`.
 - Skips files that are identical to the source.
 - Updates files that match a previous Git-tracked version of the source (safe upgrade).
 - Reports conflicts when a destination file differs from both the current and all historical source versions.
@@ -120,7 +121,7 @@ git pull
 | Variable | Default | Description |
 |---|---|---|
 | `TARGET_ROOT` | parent directory of this repo | Root directory to scan for Git projects |
-| `SYNC_CONTENT` | `both` | What to sync: `skills`, `agents`, or `both` |
+| `SYNC_CONTENT` | `both` | What to sync: `skills`, `agents`, or `both`. References are always synced alongside agents. |
 | `OVERWRITE_EXISTING` | `false` | Overwrite files not matching source history |
 | `EXCLUDED_PATHS` | this repo | Paths to exclude from scanning |
 
